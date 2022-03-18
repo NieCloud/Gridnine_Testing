@@ -37,12 +37,12 @@ public class FlightsFilter {
 
             final long hoursOnTheGround = 2;
 
-            // полное время перелета
+            // полное время перелета - разница между временем вылета первого сегмента и завершением полета последнего сегмента
             Duration totalTime = Duration.between(
                     x.getSegments().get(0).getDepartureDate(),
                     x.getSegments().get(x.getSegments().size() - 1).getArrivalDate());
 
-            // время в воздухе - сумма разниц времени между взлетом и падением каждого сегмента
+            // время в воздухе - сумма разниц времени между взлетом и посадкой каждого сегмента
             Duration timeInTheAir = x
                     .getSegments()
                     .stream()
@@ -50,19 +50,18 @@ public class FlightsFilter {
                     .reduce(Duration::plus)
                     .orElse(Duration.ofHours(0));
 
-
             // проверка - если разница полного времени перелета и времени в воздухе больше 2 часов - возвращает TRUE
             return totalTime.minus(timeInTheAir).compareTo(Duration.ofHours(hoursOnTheGround)) > 0;
         };
     }
 
-        // метод использует все предикаты (фильтры) на предоставленном листе полетов и возвращает отфильтрованный лист
-        public static <Flight> List<Flight> filter (final List<Flight> list, Predicate<Flight>... predicates) {
+    // метод использует все предикаты (фильтры) на предоставленном массиве полетов и возвращает отфильтрованный массив
+    public static <Flight> List<Flight> filter (final List<Flight> list, Predicate<Flight>... predicates) {
 
-            return list.stream()
-                    .filter(Arrays.stream(predicates).reduce(z -> true, Predicate::and))
-                    .collect(Collectors.toList());
-        }
+        return list.stream()
+                .filter(Arrays.stream(predicates).reduce(z -> true, Predicate::and))
+                .collect(Collectors.toList());
+    }
 }
 
 
